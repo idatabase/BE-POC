@@ -68,6 +68,8 @@
 
         liff.ready.then(() => {
           document.getElementById("register").style.display = "inline";
+
+          console.log(liff.getAccessToken());
         });
 
         await liff.init({ liffId: "1656923207-NVj4Xg2R" });
