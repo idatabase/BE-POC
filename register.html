@@ -39,12 +39,13 @@
       async function register() {
         try {
           const profile = await liff.getProfile();
+          const userId = profile.userId;
           const accessToken = liff.getAccessToken();
 
           const json = {
             citizenId: document.getElementById("citizenId").value,
             mobileNo: document.getElementById("mobileNo").value,
-            userId: profile.userId,
+            userId: userId,
             accessToken: accessToken,
           };
 
@@ -61,9 +62,11 @@
           .then(json => {
             console.log('parsed json', json)
 
-            if(json.customerRefNo != null){
-              console.log((json.customerRefNo));
-              sendMsg();
+            let customerRefNo = json.customerRefNo;
+            console.log(customerRefNo);
+
+            if(customerRefNo != null){
+              sendMsg(userId, customerRefNo);
             }
             else {
               alert('Registration failed');
@@ -81,13 +84,11 @@
         }
       }
 
-      async function sendMsg() {
+      async function sendMsg(userId, customerRefNo) {
         try {
-          const profile = await liff.getProfile();
-
           const json = {
-            userId: profile.userId,
-            message: "ลงทะเบียนสำเร็จ\n\nYour userId: " + profile.userId,
+            userId: userId,
+            message: "ลงทะเบียนสำเร็จ\n\nYour userId: " + userId +"\n\nYour customer reference number: " + customerRefNo,
           };
 
           const options = {
