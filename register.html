@@ -66,11 +66,14 @@
               sendMsg();
             }
             else {
-              alert('Registration failed')
+              alert('Registration failed');
             }
 
           })
-          .catch(error => (console.log(error)));
+          .catch(error => {
+            console.log(error); 
+            alert('Registration failed');
+          });
           
 
         } catch (err) {
