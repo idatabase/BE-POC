@@ -23,8 +23,6 @@
       </div>
     </div>
 
-    <button onclick="register()">ยืนยัน</button>
-
     <script src="js/vconsole.min.js"></script>
     <script>
       var vConsole = new VConsole();
@@ -66,6 +64,9 @@
             if(json.customerRefNo != null){
               console.log((json.customerRefNo));
               sendMsg();
+            }
+            else {
+              alert('Registration failed')
             }
 
           })
