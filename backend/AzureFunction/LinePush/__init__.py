@@ -16,11 +16,11 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     try:
         payload = req.get_json()
-        uuid = payload['uuid']
+        userId = payload['userId']
         message = payload['message']
 
-        if(uuid != ""):
-            PushMessage(uuid, message)
+        if(userId != ""):
+            PushMessage(userId, message)
 
     except Exception as e: 
         logging.error(e)
@@ -29,10 +29,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     return func.HttpResponse(f"This HTTP triggered function executed successfully.")
 
 
-def PushMessage(uuid, message):
+def PushMessage(userId, message):
     
     data = {
-        "to": uuid,
+        "to": userId,
         "messages": [{
             "type": "text",
             "text": message
