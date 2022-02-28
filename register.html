@@ -13,15 +13,17 @@
     <div class="form">
       <div class="thumbnail"><img src="img/account.svg" /></div>
       <div id="register" class="login-form">
-        <input type="text" placeholder="เลขที่บัตรประชาชน/หนังสือเดินทาง" autocomplete="off" required />
-        <input type="number" placeholder="หมายเลขโทรศัพท์มือถือ" autocomplete="off" pattern="\d*" required />
+        <input id="citizenId" type="text" placeholder="เลขที่บัตรประชาชน/หนังสือเดินทาง" autocomplete="off" required />
+        <input id="mobileNo" type="number" placeholder="หมายเลขโทรศัพท์มือถือ" autocomplete="off" pattern="\d*" required />
         <button onclick="verify()">ลงทะเบียน</button>
       </div>
       <div id="verify" class="login-form">
         <input type="number" placeholder="รหัส OTP" autocomplete="off" pattern="\d*" required />
-        <button onclick="sendMsg()">ยืนยัน</button>
+        <button onclick="register()">ยืนยัน</button>
       </div>
     </div>
+
+    <button onclick="register()">ยืนยัน</button>
 
     <script src="js/vconsole.min.js"></script>
     <script>
@@ -36,13 +38,16 @@
         document.getElementById("verify").style.display = "inline";
       }
 
-      async function sendMsg() {
+      async function register() {
         try {
           const profile = await liff.getProfile();
+          const accessToken = liff.getAccessToken();
 
           const json = {
-            uuid: profile.userId,
-            message: "ลงทะเบียนสำเร็จ\n\nYour UUID: " + profile.userId,
+            citizenId: document.getElementById("citizenId").value,
+            mobileNo: document.getElementById("mobileNo").value,
+            userId: profile.userId,
+            accessToken: accessToken,
           };
 
           const options = {
@@ -53,8 +58,44 @@
             },
           };
 
-          let result = await fetch("https://be-poc.azurewebsites.net/api/LinePush", options);
-          console.log(result);
+          let response = await fetch("https://be-poc.azurewebsites.net/api/Registration", options)
+          .then(response => response.json())
+          .then(json => {
+            console.log('parsed json', json)
+
+            if(json.customerRefNo != null){
+              console.log((json.customerRefNo));
+              sendMsg();
+            }
+
+          })
+          .catch(error => (console.log(error)));
+          
+
+        } catch (err) {
+          console.error(err.message);
+        }
+      }
+
+      async function sendMsg() {
+        try {
+          const profile = await liff.getProfile();
+
+          const json = {
+            userId: profile.userId,
+            message: "ลงทะเบียนสำเร็จ\n\nYour userId: " + profile.userId,
+          };
+
+          const options = {
+            method: "POST",
+            body: JSON.stringify(json),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          };
+
+          let response = await fetch("https://be-poc.azurewebsites.net/api/LinePush", options);
+          console.log(response);
 
           liff.closeWindow();
         } catch (err) {
